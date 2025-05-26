@@ -8,6 +8,7 @@
 // #include <nlohmann/json.hpp>
 #include "json.hpp"
 #include <algorithm>
+#include <cctype>
 
 using namespace std;
 using json = nlohmann::json;
@@ -19,6 +20,36 @@ vector<string> messageList;
 string toLower(const string& str) {
     string result = str;
     transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
+}
+
+// Helper to remove punctuation
+string removePunct(const string& str) {
+    string result;
+    for (char c : str) {
+        if (!ispunct(static_cast<unsigned char>(c)) || c == '\'') // keep apostrophes
+            result += c;
+    }
+    return result;
+}
+
+string trimSpaces(const string& str) {
+    string result;
+    bool inSpace = false;
+    for (char c : str) {
+        if (isspace(static_cast<unsigned char>(c))) {
+            if (!inSpace) {
+                result += ' ';
+                inSpace = true;
+            }
+        } else {
+            result += c;
+            inSpace = false;
+        }
+    }
+    // Remove leading/trailing spaces
+    if (!result.empty() && result.front() == ' ') result.erase(result.begin());
+    if (!result.empty() && result.back() == ' ') result.pop_back();
     return result;
 }
 
@@ -35,11 +66,14 @@ vector<string> splitWords(const string& line) {
 }
 
 void buildIndex() {
+    messageList.clear();
+    invertedIndex.clear();
     ifstream file("messages.txt");
     string line;
     int id = 0;
     while (getline(file, line)) {
         messageList.push_back(line);
+        std::cout << "Loaded: " << line << std::endl; // Debug print
         for (const auto& word : splitWords(line)) {
             invertedIndex[word].insert(id);
         }
@@ -53,27 +87,36 @@ int main() {
     httplib::Server svr;
 
     svr.Get("/search", [](const httplib::Request& req, httplib::Response& res) {
-         res.set_header("Access-Control-Allow-Origin", "*");
+        res.set_header("Access-Control-Allow-Origin", "*");
         if (!req.has_param("q")) {
             res.status = 400;
             res.set_content("Missing query param `q`", "text/plain");
             return;
         }
+        string query = trimSpaces(toLower(removePunct(req.get_param_value("q"))));
+        std::cout << "Query: '" << query << "'" << std::endl;
+        vector<string> results;
 
-        string query = toLower(req.get_param_value("q"));
-        json result;
-
-        if (invertedIndex.find(query) != invertedIndex.end()) {
-            for (int id : invertedIndex[query]) {
-                result["results"].push_back(messageList[id]);
+        for (const auto& line : messageList) {
+            string lower_line = trimSpaces(toLower(removePunct(line)));
+            std::cout << "Checking: '" << lower_line << "'" << std::endl;
+            if (lower_line.find(query) != string::npos) {
+                results.push_back(line);
             }
-        } else {
-            result["results"] = json::array();
         }
 
-        res.set_content(result.dump(), "application/json");
+        if (results.empty()) {
+            json j;
+            j["results"] = {};
+            res.set_content(j.dump(), "application/json");
+        } else {
+            json j;
+            j["results"] = results;
+            res.set_content(j.dump(), "application/json");
+        }
     });
 
     cout << "Server started at http://localhost:8080" << endl;
     svr.listen("0.0.0.0", 8080);
 }
+
