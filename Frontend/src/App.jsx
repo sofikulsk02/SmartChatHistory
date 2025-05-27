@@ -9,7 +9,7 @@ function App() {
     if (!query) return;
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8080/search?q=${query}`);
+        const res = await fetch(`https://smartchathistory.onrender.com/search?q=${query}`);
       const data = await res.json();
       setResults(data.results);
     } catch (error) {
