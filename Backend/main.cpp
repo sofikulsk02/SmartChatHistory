@@ -14,7 +14,7 @@ using namespace std;
 using json = nlohmann::json;
 
 unordered_map<string, set<int>> invertedIndex;
-vector<string> messages;
+vector<string> messages;    
 vector<string> messageList;
 
 string toLower(const string& str) {

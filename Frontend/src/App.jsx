@@ -4,15 +4,17 @@ function App() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false); // <-- add this
 
   const handleSearch = async () => {
     if (!query) return;
     setLoading(true);
+    setSearched(true);
     try {
-        // const res = await fetch(`https://smartchathistory.onrender.com/search?q=${query}`);
-        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/search?q=${query}`);
+                    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/search?q=${query}`);
+      // const res = await fetch(`https://smartchathistory.onrender.com/search?q=${query}`);
       const data = await res.json();
-      setResults(data.results);
+      setResults(Array.isArray(data.results) ? data.results : []); // always set to array
     } catch (error) {
       console.error("Error fetching data:", error);
       setResults([]);
@@ -53,7 +55,7 @@ function App() {
                 key={index}
                 className="bg-gray-50 p-3 rounded border border-gray-200"
                 dangerouslySetInnerHTML={{
-                  __html: msg.replace(
+                  __html: (msg || "").replace(
                     new RegExp(`(${query})`, "gi"),
                     "<mark class='bg-yellow-200'>$1</mark>"
                   ),
@@ -61,9 +63,9 @@ function App() {
               />
             ))}
           </div>
-        ) : (
+        ) : searched ? ( // <-- only show if searched
           <p className="text-gray-400 text-center">No messages found</p>
-        )}
+        ) : null}
       </div>
     </div>
   );
