@@ -169,10 +169,4 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ---
 
-## Demo
-
-> _Add a link to your live demo if available!_
-
----
-
 Enjoy searching your chat history with blazing speed! 🚀
