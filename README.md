@@ -143,8 +143,9 @@ npm run dev
 
 ## Screenshots
 
-![Smart Chat History Search Screenshot](https://user-images.githubusercontent.com/your-screenshot.png)
+![alt text](image.png)
 
+![alt text](image-1.png)
 ---
 ---
 
