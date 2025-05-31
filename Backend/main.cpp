@@ -23,7 +23,6 @@ string toLower(const string& str) {
     return result;
 }
 
-// Helper to remove punctuation
 string removePunct(const string& str) {
     string result;
     for (char c : str) {
@@ -47,7 +46,6 @@ string trimSpaces(const string& str) {
             inSpace = false;
         }
     }
-    // Remove leading/trailing spaces
     if (!result.empty() && result.front() == ' ') result.erase(result.begin());
     if (!result.empty() && result.back() == ' ') result.pop_back();
     return result;
@@ -73,7 +71,6 @@ void buildIndex() {
     int id = 0;
     while (getline(file, line)) {
         messageList.push_back(line);
-        std::cout << "Loaded: " << line << std::endl; // Debug print
         for (const auto& word : splitWords(line)) {
             invertedIndex[word].insert(id);
         }
@@ -86,7 +83,7 @@ int main() {
 
     httplib::Server svr;
 
-    svr.Get("/search", [](const httplib::Request& req, httplib::Response& res) {
+    svr.Get("/search", [](const httplib::Request& req, httplib::Response& res){
         res.set_header("Access-Control-Allow-Origin", "*");
         if (!req.has_param("q")) {
             res.status = 400;
