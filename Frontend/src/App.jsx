@@ -21,6 +21,18 @@ function App() {
     setLoading(false);
   };
 
+  // Add this function to handle input changes
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    
+    // Clear results and reset search state when input is empty
+    if (value.trim() === "") {
+      setResults([]);
+      setSearched(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-10 px-4">
       <div className="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl p-8 border border-white/20">
@@ -34,7 +46,7 @@ function App() {
             className="flex-grow p-3 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gradient-to-r from-white to-gray-50"
             placeholder="Search for a word..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleInputChange} // Changed this line
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
           <button
