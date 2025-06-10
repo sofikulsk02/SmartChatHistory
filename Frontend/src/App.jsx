@@ -26,7 +26,7 @@ function App() {
     const value = e.target.value;
     setQuery(value);
     
-    // Clear results and reset search state when input is empty
+    // Clear results and reset search state when input is empty or only whitespace
     if (value.trim() === "") {
       setResults([]);
       setSearched(false);
@@ -69,10 +69,10 @@ function App() {
                 key={index}
                 className="bg-gradient-to-r from-white to-gray-50/50 p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]"
                 dangerouslySetInnerHTML={{
-                  __html: (msg || "").replace(
-                    new RegExp(`(${query})`, "gi"),
+                  __html: query.trim() ? (msg || "").replace(
+                    new RegExp(`(${query.trim()})`, "gi"),
                     "<mark class='bg-gradient-to-r from-yellow-200 to-yellow-300 px-1 rounded'>$1</mark>"
-                  ),
+                  ) : (msg || "")
                 }}
               />
             ))}
